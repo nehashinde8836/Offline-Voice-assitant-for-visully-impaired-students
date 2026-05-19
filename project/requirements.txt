@@ -1,0 +1,27 @@
+# ── Web server ────────────────────────────────────────────────────────────────
+flask>=3.0.0
+
+# ── Speech (offline STT + TTS) ────────────────────────────────────────────────
+vosk>=0.3.45
+pyttsx3>=2.90
+sounddevice>=0.4.6
+# pyaudio>=0.2.13   # Windows: pip install pipwin && pipwin install pyaudio
+
+# ── Utilities ─────────────────────────────────────────────────────────────────
+numpy>=1.24.0
+
+# ── LLM fine-tuning + inference ───────────────────────────────────────────────
+# Install these before running finetune.py or when using the LLM:
+#
+#   pip install torch transformers peft datasets accelerate sentencepiece
+#
+# GPU (recommended):
+#   pip install bitsandbytes   # 4-bit quantization
+#
+torch>=2.0.0
+transformers>=4.38.0
+peft>=0.9.0
+datasets>=2.18.0
+accelerate>=0.27.0
+sentencepiece>=0.1.99
+# bitsandbytes>=0.43.0   # GPU only — comment out if CPU-only

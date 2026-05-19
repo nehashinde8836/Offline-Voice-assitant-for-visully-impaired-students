@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>गणित शिक्षक</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f0f2f5;
+  --panel:     #ffffff;
+  --sidebar:   #111b21;
+  --sb-text:   #e9edef;
+  --sb-muted:  #8696a0;
+  --sb-hover:  #202c33;
+  --sb-active: #2a3942;
+  --header:    #202c33;
+  --hdr-text:  #e9edef;
+  --user-msg:  #d9fdd3;
+  --user-txt:  #111b21;
+  --bot-msg:   #ffffff;
+  --bot-txt:   #111b21;
+  --time-txt:  #667781;
+  --input-bg:  #ffffff;
+  --input-bdr: #d1d7db;
+  --send:      #00a884;
+  --send-hov:  #017561;
+  --mic-idle:  #00a884;
+  --mic-rec:   #f15c6d;
+  --mic-spk:   #0078d4;
+  --divider:   #e9edef;
+  --chip-bg:   #f0f2f5;
+  --chip-bdr:  #d1d7db;
+  --chip-txt:  #3b4a54;
+  --arith-dot: #0078d4;
+  --pyth-dot:  #00a884;
+  --badge-bg:  #fff3cd;
+  --badge-txt: #856404;
+  --shadow:    0 1px 3px rgba(0,0,0,0.12);
+}
+
+html, body { height: 100%; overflow: hidden; }
+
+body {
+  font-family: 'Inter', 'Noto Sans Devanagari', system-ui, sans-serif;
+  background: var(--bg);
+  display: flex;
+  height: 100vh;
+}
+
+/* ── SIDEBAR ── */
+.sidebar {
+  width: 260px;
+  min-width: 260px;
+  background: var(--sidebar);
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid rgba(255,255,255,0.06);
+}
+
+.sb-header {
+  padding: 1rem 1.1rem 0.9rem;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.sb-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  margin-bottom: 1rem;
+}
+
+.sb-icon {
+  width: 36px; height: 36px;
+  background: var(--send);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.sb-brand-text h1 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--sb-text);
+  font-family: 'Noto Sans Devanagari', sans-serif;
+}
+.sb-brand-text p {
+  font-size: 0.68rem;
+  color: var(--sb-muted);
+  margin-top: 1px;
+}
+
+/* Mode status */
+.mode-status {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.45rem 0.7rem;
+  background: rgba(255,255,255,0.05);
+  border-radius: 8px;
+}
+.mode-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--sb-muted);
+  flex-shrink: 0;
+  transition: background 0.25s;
+}
+.mode-dot.arith { background: var(--arith-dot); }
+.mode-dot.pyth  { background: var(--pyth-dot); }
+#mode-label {
+  font-size: 0.75rem;
+  color: var(--sb-muted);
+  font-weight: 500;
+}
+
+/* Subject list */
+.sb-section-title {
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: var(--sb-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 1rem 1.1rem 0.4rem;
+}
+
+.subject-item {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.65rem 1.1rem;
+  cursor: pointer;
+  transition: background 0.15s;
+  border: none;
+  background: transparent;
+  width: 100%;
+  text-align: left;
+}
+.subject-item:hover { background: var(--sb-hover); }
+.subject-item.active { background: var(--sb-active); }
+
+.subject-icon {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+.subject-icon.arith-ic { background: rgba(0,120,212,0.2); }
+.subject-icon.pyth-ic  { background: rgba(0,168,132,0.2); }
+
+.subject-info { flex: 1; min-width: 0; }
+.subject-name {
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--sb-text);
+  font-family: 'Noto Sans Devanagari', sans-serif;
+}
+.subject-desc {
+  font-size: 0.68rem;
+  color: var(--sb-muted);
+  margin-top: 1px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-family: 'Noto Sans Devanagari', sans-serif;
+}
+
+/* Keyboard shortcut hint */
+.sb-footer {
+  margin-top: auto;
+  padding: 0.9rem 1.1rem;
+  border-top: 1px solid rgba(255,255,255,0.06);
+}
+.sb-hint {
+  font-size: 0.65rem;
+  color: var(--sb-muted);
+  line-height: 1.6;
+}
+.sb-hint kbd {
+  background: rgba(255,255,255,0.1);
+  border-radius: 3px;
+  padding: 0.1rem 0.3rem;
+  font-size: 0.62rem;
+  font-family: monospace;
+}
+
+/* ── MAIN CHAT AREA ── */
+.chat-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  background: var(--bg);
+}
+
+/* Chat header */
+.chat-header {
+  background: var(--header);
+  padding: 0.7rem 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-shrink: 0;
+  box-shadow: var(--shadow);
+}
+
+.chat-header-av {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: var(--send);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.chat-header-info { flex: 1; }
+.chat-header-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--hdr-text);
+  font-family: 'Noto Sans Devanagari', sans-serif;
+}
+.chat-header-sub {
+  font-size: 0.7rem;
+  color: #8696a0;
+  margin-top: 1px;
+  font-family: 'Noto Sans Devanagari', sans-serif;
+}
+
+/* Score pill in header */
+#score-pill {
+  display: none;
+  background: rgba(0,168,132,0.2);
+  border: 1px solid rgba(0,168,132,0.4);
+  border-radius: 100px;
+  padding: 0.2rem 0.65rem;
+  font-size: 0.72rem;
+  color: #25d366;
+  font-weight: 600;
+}
+
+/* ── MESSAGES ── */
+#chat-box {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0.75rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  background: var(--bg);
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23d1d7db' fill-opacity='0.15'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+#chat-box::-webkit-scrollbar { width: 5px; }
+#chat-box::-webkit-scrollbar-thumb { background: #c1c9d0; border-radius: 5px; }
+
+/* Date divider */
+.date-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0.6rem 0;
+}
+.date-divider span {
+  background: rgba(255,255,255,0.85);
+  border-radius: 6px;
+  padding: 0.2rem 0.75rem;
+  font-size: 0.68rem;
+  color: var(--time-txt);
+  box-shadow: var(--shadow);
+  font-weight: 500;
+}
+
+/* Message rows */
+.msg-row {
+  display: flex;
+  margin-bottom: 0.15rem;
+  animation: msgIn 0.18s ease;
+}
+.msg-row.user { justify-content: flex-end; }
+.msg-row.bot  { justify-content: flex-start; }
+
+@keyframes msgIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Bubble */
+.bubble {
+  max-width: 65%;
+  padding: 0.5rem 0.75rem 0.35rem;
+  border-radius: 7.5px;
+  font-size: 0.9rem;
+  line-height: 1.55;
+  word-break: break-word;
+  white-space: pre-wrap;
+  position: relative;
+  box-shadow: var(--shadow);
+}
+
+.msg-row.user .bubble {
+  background: var(--user-msg);
+  color: var(--user-txt);
+  border-top-right-radius: 2px;
+}
+.msg-row.bot .bubble {
+  background: var(--bot-msg);
+  color: var(--bot-txt);
+  border-top-left-radius: 2px;
+}
+
+/* Mode accent — subtle left stripe */
+.msg-row.bot.arithmetic-mode .bubble { border-left: 3px solid #0078d4; }
+.msg-row.bot.pythagoras-mode .bubble  { border-left: 3px solid #00a884; }
+
+.msg-meta {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.25rem;
+  margin-top: 0.2rem;
+}
+.msg-time {
+  font-size: 0.62rem;
+  color: var(--time-txt);
+}
+.msg-row.user .msg-time { color: #667781; }
+
+/* Tick marks for user messages */
+.tick { font-size: 0.65rem; color: #53bdeb; }
+
+/* Typing indicator */
+.typing-row { display: flex; justify-content: flex-start; margin-bottom: 0.15rem; }
+.typing-bubble {
+  background: var(--bot-msg);
+  border-radius: 7.5px;
+  border-top-left-radius: 2px;
+  padding: 0.65rem 0.9rem;
+  display: flex; gap: 4px; align-items: center;
+  box-shadow: var(--shadow);
+}
+.typing-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: #8696a0;
+  animation: tdot 1.4s infinite;
+}
+.typing-dot:nth-child(2) { animation-delay: 0.2s; }
+.typing-dot:nth-child(3) { animation-delay: 0.4s; }
+@keyframes tdot {
+  0%,60%,100% { transform: translateY(0); opacity: 0.4; }
+  30% { transform: translateY(-5px); opacity: 1; }
+}
+
+/* ── INPUT AREA ── */
+.input-area {
+  background: #f0f2f5;
+  padding: 0.6rem 1rem;
+  flex-shrink: 0;
+  border-top: 1px solid var(--divider);
+}
+
+/* Quick chips row */
+.chips-row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: 0.55rem;
+  overflow-x: auto;
+  padding-bottom: 2px;
+  scrollbar-width: none;
+}
+.chips-row::-webkit-scrollbar { display: none; }
+
+.chip-tab {
+  padding: 0.22rem 0.65rem;
+  border-radius: 100px;
+  border: 1px solid var(--chip-bdr);
+  background: var(--panel);
+  color: #667781;
+  font-size: 0.7rem;
+  font-family: 'Noto Sans Devanagari', sans-serif;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+.chip-tab.active {
+  background: var(--send);
+  border-color: var(--send);
+  color: #fff;
+}
+.chip-tab:hover:not(.active) {
+  border-color: #aab;
+  color: var(--chip-txt);
+}
+
+.chip-list {
+  display: flex;
+  gap: 0.35rem;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.chip-list::-webkit-scrollbar { display: none; }
+
+.chip {
+  padding: 0.28rem 0.75rem;
+  border-radius: 100px;
+  background: var(--panel);
+  border: 1px solid var(--chip-bdr);
+  color: var(--chip-txt);
+  font-size: 0.75rem;
+  font-family: 'Noto Sans Devanagari', sans-serif;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s;
+  flex-shrink: 0;
+  box-shadow: var(--shadow);
+}
+.chip:hover {
+  background: #e8f5e9;
+  border-color: var(--send);
+  color: #005c4b;
+}
+
+/* Main input row */
+.input-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.text-input-wrap {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  background: var(--input-bg);
+  border-radius: 24px;
+  padding: 0.45rem 0.9rem;
+  border: 1px solid transparent;
+  box-shadow: var(--shadow);
+  transition: border-color 0.15s;
+  gap: 0.5rem;
+}
+.text-input-wrap:focus-within { border-color: #c1c9d0; }
+
+#kb-input {
+  flex: 1;
+  border: none; outline: none;
+  background: transparent;
+  font-size: 0.9rem;
+  font-family: 'Noto Sans Devanagari', sans-serif;
+  color: #111b21;
+}
+#kb-input::placeholder { color: #8696a0; }
+
+/* Mic button */
+#mic-btn {
+  width: 46px; height: 46px;
+  border-radius: 50%;
+  border: none;
+  background: var(--mic-idle);
+  color: white;
+  font-size: 1.1rem;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.2s, transform 0.15s;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(0,168,132,0.35);
+  outline-offset: 3px;
+}
+#mic-btn:hover:not(:disabled) { transform: scale(1.06); }
+#mic-btn:active:not(:disabled) { transform: scale(0.94); }
+#mic-btn:focus { outline: 3px solid rgba(0,168,132,0.4); }
+#mic-btn:disabled { background: #c1c9d0; box-shadow: none; cursor: not-allowed; transform: none; }
+
+#mic-btn.listening {
+  background: var(--mic-rec);
+  box-shadow: 0 2px 12px rgba(241,92,109,0.45);
+  animation: recpulse 1.2s ease-in-out infinite;
+}
+#mic-btn.speaking {
+  background: var(--mic-spk);
+  box-shadow: 0 2px 12px rgba(0,120,212,0.4);
+}
+@keyframes recpulse {
+  0%,100% { box-shadow: 0 2px 12px rgba(241,92,109,0.45); }
+  50%      { box-shadow: 0 2px 20px rgba(241,92,109,0.7); }
+}
+
+/* Status bar */
+#status {
+  text-align: center;
+  font-size: 0.7rem;
+  color: #8696a0;
+  margin-top: 0.35rem;
+  min-height: 1rem;
+  font-family: 'Noto Sans Devanagari', sans-serif;
+}
+#status.ls { color: var(--mic-rec); }
+#status.sp { color: var(--mic-spk); }
+#status.th { color: #8696a0; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 640px) {
+  .sidebar { display: none; }
+  .bubble { max-width: 82%; }
+}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" role="complementary" aria-label="विषय निवडा">
+
+  <div class="sb-header">
+    <div class="sb-brand">
+      <div class="sb-icon" aria-hidden="true">📚</div>
+      <div class="sb-brand-text">
+        <h1>गणित शिक्षक</h1>
+        <p>Offline AI Tutor</p>
+      </div>
+    </div>
+    <div class="mode-status" aria-label="सध्याचा मोड">
+      <div class="mode-dot" id="mode-dot"></div>
+      <span id="mode-label">सामान्य मोड</span>
+    </div>
+  </div>
+
+  <div class="sb-section-title">विषय</div>
+
+  <button class="subject-item" id="btn-arith"
+          onclick="switchMode('arithmetic')"
+          aria-label="अंकगणित मोड वर जा">
+    <div class="subject-icon arith-ic" aria-hidden="true">🔢</div>
+    <div class="subject-info">
+      <div class="subject-name">अंकगणित</div>
+      <div class="subject-desc">बेरीज · वजाबाकी · गुणाकार · भागाकार</div>
+    </div>
+  </button>
+
+  <button class="subject-item" id="btn-pyth"
+          onclick="switchMode('pythagoras')"
+          aria-label="पायथागोरस मोड वर जा">
+    <div class="subject-icon pyth-ic" aria-hidden="true">📐</div>
+    <div class="subject-info">
+      <div class="subject-name">पायथागोरस</div>
+      <div class="subject-desc">a² + b² = c² · कर्ण · त्रिकोण</div>
+    </div>
+  </button>
+
+  <div class="sb-footer">
+    <div class="sb-hint">
+      <kbd>Space</kbd> — मायक्रोफोन<br>
+      <kbd>Enter</kbd> — संदेश पाठवा
+    </div>
+  </div>
+
+</aside>
+
+<!-- MAIN CHAT -->
+<div class="chat-area">
+
+  <!-- Chat header -->
+  <div class="chat-header">
+    <div class="chat-header-av" aria-hidden="true">🤖</div>
+    <div class="chat-header-info">
+      <div class="chat-header-name" id="chat-title">मराठी गणित शिक्षक</div>
+      <div class="chat-header-sub" id="chat-sub">ऑनलाइन · आवाज-आधारित AI</div>
+    </div>
+    <div id="score-pill" aria-live="polite"></div>
+  </div>
+
+  <!-- Messages -->
+  <div id="chat-box" role="log" aria-live="polite" aria-label="संभाषण">
+    <div class="date-divider"><span id="today-label"></span></div>
+  </div>
+
+  <!-- Input area -->
+  <div class="input-area">
+
+    <!-- Chip tabs + chips -->
+    <div class="chips-row" role="tablist" aria-label="जलद आदेश">
+      <button class="chip-tab active" role="tab" onclick="showChips('arith',this)">अंकगणित</button>
+      <button class="chip-tab" role="tab" onclick="showChips('pyth',this)">पायथागोरस</button>
+      <button class="chip-tab" role="tab" onclick="showChips('ctrl',this)">नियंत्रण</button>
+    </div>
+
+    <div id="chips-arith" class="chip-list">
+      <button class="chip" onclick="sendText('पाच अधिक तीन')">पाच अधिक तीन</button>
+      <button class="chip" onclick="sendText('दहा वजा चार')">दहा वजा चार</button>
+      <button class="chip" onclick="sendText('6 गुणिले 7')">6 गुणिले 7</button>
+      <button class="chip" onclick="sendText('20 भागिले 4')">20 भागिले 4</button>
+      <button class="chip" onclick="sendText('5 + 3 गोष्टीतून समजाव')">गोष्टीतून समजाव</button>
+      <button class="chip" onclick="sendText('क्विझ सुरू कर')">क्विझ सुरू कर</button>
+    </div>
+    <div id="chips-pyth" class="chip-list" style="display:none">
+      <button class="chip" onclick="sendText('समजाव')">समजाव</button>
+      <button class="chip" onclick="sendText('गोष्ट सांग')">गोष्ट सांग</button>
+      <button class="chip" onclick="sendText('उदाहरण दे')">उदाहरण दे</button>
+      <button class="chip" onclick="sendText('बाजू 3 आणि 4 कर्ण किती')">बाजू 3 आणि 4</button>
+      <button class="chip" onclick="sendText('बाजू तीन आणि चार कर्ण किती')">बाजू तीन आणि चार</button>
+      <button class="chip" onclick="sendText('क्विझ सुरू कर')">क्विझ सुरू कर</button>
+    </div>
+    <div id="chips-ctrl" class="chip-list" style="display:none">
+      <button class="chip" onclick="sendText('अंकगणित')">अंकगणित मोड</button>
+      <button class="chip" onclick="sendText('पायथागोरस मोड')">पायथागोरस मोड</button>
+      <button class="chip" onclick="sendText('परत सांगा')">परत सांगा</button>
+      <button class="chip" onclick="sendText('क्विझ थांब')">क्विझ थांब</button>
+    </div>
+
+    <!-- Input row -->
+    <div class="input-row">
+      <div class="text-input-wrap">
+        <input id="kb-input" type="text"
+               placeholder="संदेश टाइप करा..."
+               aria-label="संदेश टाइप करा"
+               onkeydown="if(event.key==='Enter') sendText(this.value)"/>
+      </div>
+      <button id="mic-btn"
+              aria-label="बोलण्यासाठी दाबा (Spacebar)">🎤</button>
+    </div>
+
+    <div id="status" role="status" aria-live="assertive">बोलण्यासाठी बटण दाबा</div>
+
+  </div>
+</div>
+
+<script>
+// ── Refs ───────────────────────────────────────────────────────────────────────
+const micBtn    = document.getElementById("mic-btn");
+const statusEl  = document.getElementById("status");
+const chatBox   = document.getElementById("chat-box");
+const modeDot   = document.getElementById("mode-dot");
+const modeLabel = document.getElementById("mode-label");
+const scorePill = document.getElementById("score-pill");
+const chatTitle = document.getElementById("chat-title");
+const chatSub   = document.getElementById("chat-sub");
+
+let isListening = false;
+let currentMode = "general";
+let typingEl    = null;
+
+// ── Date label ─────────────────────────────────────────────────────────────────
+document.getElementById("today-label").textContent =
+  new Date().toLocaleDateString("mr-IN", { weekday:"long", day:"numeric", month:"long" });
+
+// ── Mode UI ────────────────────────────────────────────────────────────────────
+const modeCfg = {
+  general:    { label:"सामान्य मोड",     dot:"",      arith:false, pyth:false,
+                title:"मराठी गणित शिक्षक", sub:"ऑनलाइन · आवाज-आधारित AI" },
+  arithmetic: { label:"अंकगणित मोड",     dot:"arith", arith:true,  pyth:false,
+                title:"अंकगणित",           sub:"बेरीज · वजाबाकी · गुणाकार · भागाकार" },
+  pythagoras: { label:"पायथागोरस मोड",   dot:"pyth",  arith:false, pyth:true,
+                title:"पायथागोरस प्रमेय", sub:"a² + b² = c² · कर्ण · त्रिकोण" },
+};
+
+function updateModeUI(mode) {
+  currentMode = mode;
+  const c = modeCfg[mode] || modeCfg.general;
+  modeLabel.textContent = c.label;
+  modeDot.className = "mode-dot" + (c.dot ? " " + c.dot : "");
+  chatTitle.textContent = c.title;
+  chatSub.textContent   = c.sub;
+  document.getElementById("btn-arith").className =
+    "subject-item" + (c.arith ? " active" : "");
+  document.getElementById("btn-pyth").className =
+    "subject-item" + (c.pyth ? " active" : "");
+}
+
+function switchMode(mode) {
+  sendText(mode === "arithmetic" ? "अंकगणित" : "पायथागोरस मोड");
+}
+
+// ── Chips ──────────────────────────────────────────────────────────────────────
+function showChips(id, btn) {
+  ["arith","pyth","ctrl"].forEach(k => {
+    document.getElementById("chips-" + k).style.display = k === id ? "flex" : "none";
+  });
+  document.querySelectorAll(".chip-tab").forEach(t => t.classList.remove("active"));
+  btn.classList.add("active");
+}
+
+// ── Helpers ────────────────────────────────────────────────────────────────────
+function nowTime() {
+  return new Date().toLocaleTimeString("mr-IN", { hour:"2-digit", minute:"2-digit" });
+}
+function setStatus(t, cls) {
+  statusEl.textContent = t;
+  statusEl.className = cls || "";
+}
+
+// ── Typing indicator ───────────────────────────────────────────────────────────
+function showTyping() {
+  if (typingEl) return;
+  typingEl = document.createElement("div");
+  typingEl.className = "typing-row";
+  typingEl.innerHTML =
+    '<div class="typing-bubble">' +
+      '<div class="typing-dot"></div>' +
+      '<div class="typing-dot"></div>' +
+      '<div class="typing-dot"></div>' +
+    '</div>';
+  chatBox.appendChild(typingEl);
+  chatBox.scrollTop = chatBox.scrollHeight;
+}
+function hideTyping() {
+  if (typingEl) { typingEl.remove(); typingEl = null; }
+}
+
+// ── Add message ────────────────────────────────────────────────────────────────
+function addMsg(text, role, mode) {
+  hideTyping();
+
+  const row = document.createElement("div");
+  row.className = "msg-row " + role +
+    (role === "bot" && mode && mode !== "general" ? " " + mode + "-mode" : "");
+
+  const bubble = document.createElement("div");
+  bubble.className = "bubble";
+  bubble.textContent = text;
+  bubble.setAttribute("aria-label", (role === "bot" ? "शिक्षक: " : "विद्यार्थी: ") + text);
+
+  const meta = document.createElement("div");
+  meta.className = "msg-meta";
+
+  const time = document.createElement("span");
+  time.className = "msg-time";
+  time.textContent = nowTime();
+  meta.appendChild(time);
+
+  if (role === "user") {
+    const tick = document.createElement("span");
+    tick.className = "tick";
+    tick.setAttribute("aria-hidden", "true");
+    tick.textContent = "✓";
+    meta.appendChild(tick);
+  }
+
+  bubble.appendChild(meta);
+  row.appendChild(bubble);
+  chatBox.appendChild(row);
+  chatBox.scrollTop = chatBox.scrollHeight;
+
+  // Quiz score detection
+  const m = text.match(/(\d+)\s*पैकी\s*(\d+)/);
+  if (m) {
+    scorePill.style.display = "block";
+    scorePill.textContent = "🏆 " + m[2] + " / " + m[1];
+  }
+  if (text.includes("क्विझ संपली")) {
+    setTimeout(() => { scorePill.style.display = "none"; }, 5000);
+  }
+}
+
+// ── TTS ────────────────────────────────────────────────────────────────────────
+function speakText(text, onDone) {
+  if (!("speechSynthesis" in window)) { if (onDone) onDone(); return; }
+  window.speechSynthesis.cancel();
+  const utt = new SpeechSynthesisUtterance(text);
+  const voices = window.speechSynthesis.getVoices();
+  const pref = voices.find(v => v.lang === "mr-IN")
+            || voices.find(v => v.lang.startsWith("hi"))
+            || null;
+  if (pref) utt.voice = pref;
+  utt.lang = "mr-IN"; utt.rate = 0.88; utt.pitch = 1.0; utt.volume = 1.0;
+
+  const safety = Math.max(4000, text.length * 75);
+  let done = false;
+  function finish() {
+    if (done) return; done = true;
+    micBtn.classList.remove("speaking");
+    micBtn.innerHTML = "🎤";
+    micBtn.disabled = false;
+    setStatus("बोलण्यासाठी बटण दाबा", "");
+    if (onDone) onDone();
+  }
+  utt.onend = finish; utt.onerror = finish;
+  setTimeout(finish, safety);
+  micBtn.classList.add("speaking");
+  micBtn.innerHTML = "🔊";
+  setStatus("शिक्षक बोलत आहे...", "sp");
+  window.speechSynthesis.speak(utt);
+}
+
+if ("speechSynthesis" in window)
+  window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
+
+// ── Send ───────────────────────────────────────────────────────────────────────
+async function sendText(text) {
+  text = text.trim();
+  if (!text) return;
+  addMsg(text, "user", currentMode);
+  setStatus("विचार करत आहे...", "th");
+  micBtn.disabled = true;
+  const kb = document.getElementById("kb-input");
+  if (kb) kb.value = "";
+  showTyping();
+
+  try {
+    const res = await fetch("/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ text }),
+    });
+    const data = await res.json();
+    if (data.mode) updateModeUI(data.mode);
+    addMsg(data.response, "bot", data.mode);
+    speakText(data.response, () => { micBtn.disabled = false; });
+  } catch (e) {
+    hideTyping();
+    const err = "सर्व्हरशी संपर्क होत नाही. कृपया server.py चालू आहे का ते तपासा.";
+    addMsg(err, "bot", currentMode);
+    speakText(err);
+    micBtn.disabled = false;
+  }
+}
+
+// ── Speech Recognition ─────────────────────────────────────────────────────────
+function setupRecognition() {
+  // Always use offline Vosk via backend /listen endpoint
+  micBtn.disabled = false;
+}
+
+micBtn.addEventListener("click", async () => {
+  if (window.speechSynthesis?.speaking) {
+    window.speechSynthesis.cancel();
+    micBtn.classList.remove("speaking");
+    micBtn.innerHTML = "🎤";
+    setStatus("बोलण्यासाठी बटण दाबा", "");
+    return;
+  }
+  if (isListening) return;
+
+  isListening = true;
+  micBtn.classList.add("listening");
+  micBtn.innerHTML = "⏹";
+  micBtn.disabled = true;
+  setStatus("ऐकत आहे... बोला", "ls");
+
+  try {
+    const res = await fetch("/listen", { method: "POST" });
+    const data = await res.json();
+    isListening = false;
+    micBtn.classList.remove("listening");
+    micBtn.innerHTML = "🎤";
+    micBtn.disabled = false;
+
+    if (data.ok && data.text && data.text.trim()) {
+      sendText(data.text.trim());
+    } else {
+      setStatus("काही ऐकू आले नाही. पुन्हा प्रयत्न करा.", "");
+    }
+  } catch (e) {
+    isListening = false;
+    micBtn.classList.remove("listening");
+    micBtn.innerHTML = "🎤";
+    micBtn.disabled = false;
+    setStatus("आवाज ओळखता आला नाही.", "");
+  }
+});
+
+document.addEventListener("keydown", e => {
+  if (e.code === "Space" && !micBtn.disabled && !isListening &&
+      document.activeElement !== document.getElementById("kb-input")) {
+    e.preventDefault();
+    micBtn.click();
+  }
+});
+
+setupRecognition();
+
+window.addEventListener("load", () => {
+  fetch("/reset", { method: "POST" }).catch(() => {});
+  const greeting = "नमस्कार! मी तुमचा मराठी गणित शिक्षक आहे.\n\nडाव्या बाजूला विषय निवडा:\n• अंकगणित — बेरीज, वजाबाकी, गुणाकार, भागाकार\n• पायथागोरस — a² + b² = c²\n\nखाली बटण दाबा आणि बोला, किंवा टाइप करा.";
+  addMsg(greeting, "bot", "general");
+  setTimeout(() => speakText(greeting), 600);
+});
+</script>
+</body>
+</html>
